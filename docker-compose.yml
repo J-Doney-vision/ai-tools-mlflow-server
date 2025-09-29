@@ -13,41 +13,18 @@ services:
       interval: 10s
       retries: 5
 
-  minio:
-    image: minio/minio:latest
-    ports:
-      - "9000:9000"  # API, accessible remotely
-      - "9001:9001"  # Console, accessible remotely
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-    volumes:
-      - minio-data:/data
-    command: server /data --console-address ":9001"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 10s
-      retries: 5
-
   mlflow:
     build: .
     ports:
-      - "5000:5000"  # Exposed for remote access
+      - "5000:5000"
     environment:
       MLFLOW_BACKEND_STORE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}
-      MLFLOW_DEFAULT_ARTIFACT_ROOT: s3://${MLFLOW_S3_BUCKET}/
-      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
-      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
-      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      MLFLOW_DEFAULT_ARTIFACT_ROOT: file:///mlruns  # Container path for artifacts
     depends_on:
       db:
         condition: service_healthy
-      minio:
-        condition: service_healthy
     volumes:
-      - ./mlflow:/mlflow  # Local path for artifacts if needed (hybrid with MinIO)
-    command: mlflow server --host 0.0.0.0 --port 5000  # Bind to all interfaces
+      - /mnt/hdd/mlflow:/mlruns  # Mount host path to container
 
 volumes:
   db-data:
-  minio-data:
