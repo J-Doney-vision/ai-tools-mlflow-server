@@ -19,12 +19,12 @@ services:
       - "5000:5000"
     environment:
       MLFLOW_BACKEND_STORE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}
-      MLFLOW_DEFAULT_ARTIFACT_ROOT: file:///mlruns  # Container path for artifacts
+      MLFLOW_DEFAULT_ARTIFACT_ROOT: file:///mlruns
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - /mnt/hdd/mlflow:/mlruns  # Mount host path to container
+      - /mnt/hdd/mlflow:/mlruns  # Custom path; change as needed
 
 volumes:
   db-data:

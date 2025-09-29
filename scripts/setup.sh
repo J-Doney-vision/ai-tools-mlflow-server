@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Create MinIO bucket
+# For MinIO mode only: Create bucket
 docker exec -it minio mc mb local/mlflow
 
-echo "Setup complete. Run docker-compose up -d"
+echo "MinIO setup complete. Run docker-compose -f docker-compose.yml -f docker-compose.minio.yml up -d"
